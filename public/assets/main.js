@@ -9,12 +9,9 @@ searchBtn.addEventListener('click', () => {
     const headers = new Headers({
         Authorization: `Bearer ${apiKey}`
     });
+});
 
-    fetch(`https://api.pexels.com/v1/search?query=${searchQuery}`, {
-        headers: {
-            Authorization: 'Bearer YOUR API KEY'
-        }
-    })
+    fetch(`https://api.pexels.com/v1/search?query=${searchQuery}`, { headers: headers }) // This is the API endpoint
     .then(response => response.json())
     .then(data => {
         searchResults.innerHTML = '';
@@ -26,5 +23,6 @@ searchBtn.addEventListener('click', () => {
     })
     .catch(error => {
         console.error('Error fetching data:', error);
-    });
-});
+        const message = document.getElementById('message');
+        message.textContent = 'Error: Could not retrieve images.'; // Update message as needed
+      });
