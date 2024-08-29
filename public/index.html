@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>NY Image Finder</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    
+    <!-- Header Section -->
+    <header>
+        <h1> NY Image Finder</h1>
+        <p>Search for Images Using Pixabay API</p>
+    </header>
+    <!-- Search Form Section-->
+    <form id = "search-form">
+        <input type="text" id="search-input" placeholder="Search Images...">
+        <button type="submit">Search</button>
+    </form>
+    <!-- Image Container Section -->
+     <div id="image-results"></div>
+     <button id="load-more" class="hidden">More Images</button>
+
+     <!-- Modal Section  -->
+    <div id="image-modal" class="hidden">
+        <div id="modal-content">
+            <span class="modal-close">&times;</span>
+            <img id="modal-image" src="" alt="">
+            <div id="modal-info"></div>
+        </div>
+    </div>
+    <!-- Footer Section -->
+     <footer>
+            <p>&copy; 2024 NY Image Finder</p>
+        </footer>
+    <!-- JavaScript Section -->
+    <script src="assets/main.js"></script>
+
+
 </body>
 </html>
