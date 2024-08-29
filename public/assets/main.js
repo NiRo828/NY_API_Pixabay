@@ -1,28 +1,27 @@
 const searchBox = document.getElementById('search-box');
 const searchBtn = document.getElementById('search-btn');
 const searchResults = document.getElementById('image-results');
+const message = document.getElementById('message');
 
-
-searchBtn.addEventListener('click', () => {
-    const searchQuery = searchBox.value;
-    const apiKey = 'uBcfWovqMnlE2L0VJeOS3EpLzMOPXtAjqmeW78APnnu7684ANZaJm133'
-    const headers = new Headers({
-        Authorization: `Bearer ${apiKey}`
+searchBtn.addEventListener('click', async () => {
+  const apiKey = '39574753-1d7916569f8a04f1cc685f33f'
+  const query = searchBox.value;
+  if (!query) {
+    message.innerText = 'Please enter a search term';
+    return;
+  }
+  message.innerText = 'Searching...';
+  searchResults.innerHTML = '';
+  try {
+    const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&?query=${query}`);
+    const data = await response.json();
+    message.innerText = '';
+    data.forEach((image) => {
+      const img = document.createElement('img');
+      img.src = image.url;
+      searchResults.appendChild(img);
     });
+  } catch (error) {
+    message.innerText = 'An error occurred. Please try again later.';
+  }
 });
-
-    fetch(`https://api.pexels.com/v1/search?query=${searchQuery}`, { headers: headers }) // This is the API endpoint
-    .then(response => response.json())
-    .then(data => {
-        searchResults.innerHTML = '';
-        data.photos.forEach(photo => {
-            const img = document.createElement('img');
-            img.src = photo.src.medium;
-            searchResults.appendChild(img);
-        });
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-        const message = document.getElementById('message');
-        message.textContent = 'Error: Could not retrieve images.'; // Update message as needed
-      });
