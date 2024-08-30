@@ -131,7 +131,7 @@ header {
     max-height: 90%;
 }
 
-.modal-class {
+.hidden {
     display: none;
 }
 

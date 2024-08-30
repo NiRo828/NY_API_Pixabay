@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const favoriteIcon = document.createElement('span');
                     favoriteIcon.classList.add('favorite-icon');
-                    favoriteIcon.innerHTML = '';
+                    favoriteIcon.innerHTML = '<3';
                     favoriteIcon.addEventListener('click', () => {
                         localStorage.setItem(image.id, JSON.stringify(image));            
                         alert('Image added to favorites!');
