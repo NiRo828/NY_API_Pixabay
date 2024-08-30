@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadMoreButton = document.getElementById('load-more');
     const modal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
-    const modalInfo = document.getElementById('modal-info'); // New line for modal info
+    const modalInfo = document.getElementById('modal-info');
     const modalClose = document.querySelector('.modal-close');
+    const filterButtons = document.querySelectorAll('.filter-btn');
 
     searchForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -22,11 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadMoreButton.addEventListener('click', () => {
         currentPage++;
-        fetchImages(); // Load more images on button click
+        fetchImages();
     });
 
     modalClose.addEventListener('click', () => {
-        modal.classList.add('hidden'); // Close the modal on click
+        modal.classList.add('hidden');
+    });
+
+    filterButtons.forEach(filter => {
+        filter.addEventListener('click', () => {
+            currentSearchTerm = filter.dataset.name === 'all' ? '' : filter.dataset.name;
+            currentPage = 1;
+            fetchImages();
+        });
     });
 
     function fetchImages() {
@@ -34,21 +43,40 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 if (currentPage === 1) {
-                    imageResults.innerHTML = ''; // Clear previous results for new search
+                    imageResults.innerHTML = ''; 
                 }
                 data.hits.forEach(image => {
+                    const imageCard = document.createElement('div');
+                    imageCard.classList.add('image-card');
+
                     const img = document.createElement('img');
                     img.src = image.previewURL;
                     img.alt = image.tags;
-                    img.classList.add('image-result');
+
+                    const imageInfo = document.createElement('div');
+                    imageInfo.classList.add('image-info');
+                    imageInfo.innerText = image.tags;
+
+                    const favoriteIcon = document.createElement('span');
+                    favoriteIcon.classList.add('favorite-icon');
+                    favoriteIcon.innerHTML = '';
+                    favoriteIcon.addEventListener('click', () => {
+                        localStorage.setItem(image.id, JSON.stringify(image));            
+                        alert('Image added to favorites!');
+                    });
+
                     img.addEventListener('click', () => {
                         modalImage.src = image.largeImageURL;
-                        modalInfo.innerHTML = `Tags: ${image.tags}`; // Add tags to modal info
-                        modal.classList.remove('hidden'); // Display image in modal
+                        modalInfo.innerHTML = `Tags: ${image.tags}`;
+                        modal.classList.remove('hidden');
                     });
-                    imageResults.appendChild(img);
+
+                    imageCard.appendChild(img);
+                    imageCard.appendChild(imageInfo);
+                    imageCard.appendChild(favoriteIcon);
+                    imageResults.appendChild(imageCard);
                 });
-                // Show "Load More" button only if more images are available
+
                 loadMoreButton.style.display = data.hits.length > 0 ? 'block' : 'none';
             });
     }
