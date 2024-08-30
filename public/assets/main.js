@@ -10,20 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadMoreButton = document.getElementById('load-more');
     const modal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
+    const modalInfo = document.getElementById('modal-info'); // New line for modal info
     const modalClose = document.querySelector('.modal-close');
 
     searchForm.addEventListener('submit', (e) => {
         e.preventDefault();
         currentPage = 1;
         currentSearchTerm = searchInput.value.trim();
-        fetchImages(); // Call the function to fetch images based on the search term
+        fetchImages();
     });
 
     loadMoreButton.addEventListener('click', () => {
         currentPage++;
         fetchImages(); // Load more images on button click
     });
-// <!-- Modal Section  -->
+
     modalClose.addEventListener('click', () => {
         modal.classList.add('hidden'); // Close the modal on click
     });
@@ -42,10 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.classList.add('image-result');
                     img.addEventListener('click', () => {
                         modalImage.src = image.largeImageURL;
+                        modalInfo.innerHTML = `Tags: ${image.tags}`; // Add tags to modal info
                         modal.classList.remove('hidden'); // Display image in modal
                     });
                     imageResults.appendChild(img);
                 });
+                // Show "Load More" button only if more images are available
+                loadMoreButton.style.display = data.hits.length > 0 ? 'block' : 'none';
             });
     }
 });
