@@ -16,17 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         currentPage = 1;
         currentSearchTerm = searchInput.value.trim();
-        fetchImages();
-        
+        fetchImages(); // Call the function to fetch images based on the search term
     });
 
     loadMoreButton.addEventListener('click', () => {
         currentPage++;
-        fetchImages();
+        fetchImages(); // Load more images on button click
     });
-
+// <!-- Modal Section  -->
     modalClose.addEventListener('click', () => {
-        modal.classList.add('hidden');
+        modal.classList.add('hidden'); // Close the modal on click
     });
 
     function fetchImages() {
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 if (currentPage === 1) {
-                    imageResults.innerHTML = '';
+                    imageResults.innerHTML = ''; // Clear previous results for new search
                 }
                 data.hits.forEach(image => {
                     const img = document.createElement('img');
@@ -43,25 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.classList.add('image-result');
                     img.addEventListener('click', () => {
                         modalImage.src = image.largeImageURL;
-                        modal.classList.remove('hidden');
+                        modal.classList.remove('hidden'); // Display image in modal
                     });
                     imageResults.appendChild(img);
                 });
             });
-    }
-
-    function displayImages(images) {
-        imageResults.innerHTML = '';
-        images.forEach(image => {
-            const img = document.createElement('img');
-            img.src = image.previewURL;
-            img.alt = image.tags;
-            img.classList.add('image-result');
-            img.addEventListener('click', () => {
-                modalImage.src = image.largeImageURL;
-                modal.classList.remove('hidden');
-            });
-            imageResults.appendChild(img);
-        });
     }
 });
