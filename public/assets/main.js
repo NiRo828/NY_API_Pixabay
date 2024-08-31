@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_KEY = '39574753-1d7916569f8a04f1cc685f33f';
-    const API_URL = 'https://pixabay.com/api/';
+    
     let currentPage = 1;
     let currentSearchTerm = '';
 
