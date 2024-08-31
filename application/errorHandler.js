@@ -1,6 +1,16 @@
+// Purpose: Error handling middleware for the application
 function handleError(err, req, res, next) {
-    console.error('[${new Date().toISOString()}] ${err.message}');
-    res.status(500).json({ error:err.message || 'Something went wrong in the Internal server!'});
+    console.error(err.stack); // Log the error stack trace for debugging
+
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+
+    res.status(statusCode).json({
+        error: {
+            message,
+            statusCode,
+        },
+    });
 }
 
 module.exports = handleError;
