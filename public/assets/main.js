@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+    const API_URL = '/api/images';
     let currentPage = 1;
     let currentSearchTerm = '';
 
@@ -42,50 +42,51 @@ document.addEventListener('DOMContentLoaded', () => {
         displayFavorites();
     });
 
-    function fetchImages() {
-        fetch(`${API_URL}?key=${API_KEY}&q=${currentSearchTerm}&image_type=photo&page=${currentPage}`)
-            .then(res => res.json())
-            .then(data => {
-                if (currentPage === 1) {
-                    imageResults.innerHTML = ''; 
-                }
-                data.hits.forEach(image => {
-                    createImageCard(image);
-                });
+    const fetchImages = async () => {
+        try {
+            const res = await fetch(`${API_URL}?q=${encodeURIComponent(currentSearchTerm)}&page=${currentPage}`);
+            const { hits } = await res.json();
+            if (currentPage === 1) {
+                imageResults.innerHTML = '';
+            }
+            hits.forEach(createImageCard);
+            loadMoreButton.style.display = hits.length > 0 ? 'block' : 'none';
+        } catch (error) {
+            console.error("Error fetching images:", error);
+        }
+    };
 
-                loadMoreButton.style.display = data.hits.length > 0 ? 'block' : 'none';
-            });
-    }
-
-    function createImageCard(image) {
+    const createImageCard = ({ previewURL, tags, id, largeImageURL }) => {
         const imageCard = document.createElement('div');
         imageCard.classList.add('image-card');
 
         const img = document.createElement('img');
-        img.src = image.previewURL;
-        img.alt = image.tags;
+        img.dataset.src = previewURL;
+        img.alt = tags;
+        img.classList.add('lazyload');
 
         const imageInfo = document.createElement('div');
         imageInfo.classList.add('image-info');
-        imageInfo.innerText = image.tags;
+        imageInfo.innerText = tags;
 
         const favoriteIcon = document.createElement('span');
         favoriteIcon.classList.add('favorite-icon');
         favoriteIcon.innerHTML = '&#9733;';
-        if (localStorage.getItem(image.id)) {
+        if (localStorage.getItem(id)) {
             favoriteIcon.classList.add('favorited');
         }
-        favoriteIcon.addEventListener('click', () => {
+        favoriteIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (favoriteIcon.classList.toggle('favorited')) {
-                localStorage.setItem(image.id, JSON.stringify(image));
+                localStorage.setItem(id, JSON.stringify({ previewURL, tags, id, largeImageURL }));
             } else {
-                localStorage.removeItem(image.id);
+                localStorage.removeItem(id);
             }
         });
 
         img.addEventListener('click', () => {
-            modalImage.src = image.largeImageURL;
-            modalInfo.innerHTML = `Tags: ${image.tags}`;
+            modalImage.src = largeImageURL;
+            modalInfo.innerHTML = `Tags: ${tags}`;
             modal.classList.remove('hidden');
         });
 
@@ -93,13 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
         imageCard.appendChild(imageInfo);
         imageCard.appendChild(favoriteIcon);
         imageResults.appendChild(imageCard);
-    }
+    };
 
-    function displayFavorites() {
+    const displayFavorites = () => {
         imageResults.innerHTML = '';
         Object.keys(localStorage).forEach(key => {
             const image = JSON.parse(localStorage.getItem(key));
             createImageCard(image);
         });
-    }
+    };
 });
