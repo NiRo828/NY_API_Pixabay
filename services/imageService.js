@@ -1,20 +1,39 @@
+const fetch = require('node-fetch');
+const { PIXABAY_API_KEY } = require('../infrastructure/env');
 const { getFromCache, setInCache } = require('../domain/cache');
-const { pixabayClient } = require('../infrastructure/httpClient');
 
-async function fetchImages(searchTerm, page = 1) {
-    const cacheKey = `pixabay-${searchTerm}-${page}`;
+async function fetchImages(searchTerm, page) {
+    const cacheKey = `${searchTerm}-${page}`;
     const cachedData = getFromCache(cacheKey);
-    if (cachedData) return cachedData;
+
+    if (cachedData) {
+        console.log(`Serving cached data for term: ${searchTerm}, page: ${page}`);
+        return cachedData;
+    }
+
+    // Ensure the search term is properly formatted and valid
+    if (!searchTerm || typeof searchTerm !== 'string' || searchTerm.trim().length === 0) {
+        throw new Error('Invalid search term');
+    }
+
+    const url = `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(searchTerm)}&page=${page}`;
+    console.log(`Requesting data from Pixabay API: ${url}`);
 
     try {
-        const response = await pixabayClient.get('/', {
-            params: { q: searchTerm, page },
-        });
+        const response = await fetch(url);
 
-        setInCache(cacheKey, response.data);
-        return response.data;
+        if (!response.ok) {
+            console.error(`Pixabay API responded with status: ${response.status} - ${response.statusText}`);
+            throw new Error(`API error! Status: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log(`Received data from Pixabay API`, data);
+        setInCache(cacheKey, data); // Cache the response
+        return data;
     } catch (error) {
-        throw new Error('Failed to fetch images');
+        console.error(`Error fetching images from Pixabay API: ${error.message}`);
+        throw error; // Re-throw the error to be caught by the caller
     }
 }
 

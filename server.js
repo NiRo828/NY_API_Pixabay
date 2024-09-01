@@ -1,27 +1,21 @@
-// /server.js
-require('dotenv').config();
-const express = require('express');
+import dotenv from 'dotenv';
+dotenv.config();
+const express = require("express");
 const path = require('path');
-const { fetchImages } = require('./services/imageService');
+const { handlePixabayRequest } = require('./application/pixabayHandler');
 const handleError = require('./application/errorHandler');
+const { PORT } = require('./infrastructure/env');
+
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Serve static files
+
+
+// Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API route to fetch images
-app.get('/api/images', async (req, res, next) => {
-    try {
-        const searchTerm = req.query.q || '';
-        const page = parseInt(req.query.page, 10) || 1; 
-        const data = await fetchImages(searchTerm, page);
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-});
+// API route to fetch images from Pixabay
+app.get('/api/images', handlePixabayRequest);
 
 // Error handling middleware
 app.use(handleError);
